@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milk × Fat Calculator</title>
+    <style>
+        /* General Styles */
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* App Container */
+        .app {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #292929;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* Inputs and Buttons */
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        input {
+            background: #333;
+            color: white;
+            outline: none;
+        }
+
+        button {
+            background: #04b504;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #038d03;
+        }
+
+        /* Vendors List */
+        .list-of-vendors {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        .unit {
+            background: #292929;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .unit input {
+            flex: 1;
+            text-align: center;
+        }
+
+        .result {
+            font-size: 16px;
+            font-weight: bold;
+            color: yellow;
+            width: 80px;
+            text-align: center;
+        }
+
+        /* Totals and Avg Fat Section */
+        .total-container, .avg-fat-container {
+            background: #292929;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+        }
+
+        .total-container span, .avg-fat-container span {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+            color: cyan;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+        <h2>No of Vendors</h2>
+        <input type="number" id="noEntered" placeholder="Enter no of vendors">
+        <button onclick="renderInputs()">Confirm</button>
+    </div>
+
+    <div class="list-of-vendors"></div>
+
+    <div class="total-container">
+        <span>Total Milk: <span id="totalMilk">0.00</span></span>
+        <span>Total (Milk × Fat / 65): <span id="totalSum">0.00</span></span>
+    </div>
+
+    <div class="avg-fat-container">
+        <span>Avg Fat: <span id="avgFat">0.00</span></span>
+    </div>
+
+    <script>
+        function renderInputs() {
+            const noOfVendors = parseInt(document.querySelector("#noEntered").value, 10);
+            const list = document.querySelector(".list-of-vendors");
+            list.innerHTML = ""; // Clear previous inputs
+
+            if (isNaN(noOfVendors) || noOfVendors <= 0) {
+                alert("Please enter a valid number of vendors.");
+                return;
+            }
+
+            for (let i = 0; i < noOfVendors; i++) {
+                const unitDiv = document.createElement("div");
+                unitDiv.classList.add("unit");
+
+                const milkInput = document.createElement("input");
+                milkInput.type = "number";
+                milkInput.classList.add("milk-input");
+                milkInput.placeholder = "MILK";
+                milkInput.oninput = calculateTotals; 
+
+                const fatInput = document.createElement("input");
+                fatInput.type = "number";
+                fatInput.classList.add("fat-input");
+                fatInput.placeholder = "FAT%";
+                fatInput.oninput = calculateTotals; 
+
+                const resultDiv = document.createElement("div");
+                resultDiv.classList.add("result");
+                resultDiv.innerText = "0.00";
+
+                unitDiv.appendChild(milkInput);
+                unitDiv.appendChild(fatInput);
+                unitDiv.appendChild(resultDiv);
+                list.appendChild(unitDiv);
+            }
+
+            // Place total & avg fat containers exactly below the inputs
+            list.appendChild(document.querySelector(".total-container"));
+            list.appendChild(document.querySelector(".avg-fat-container"));
+        }
+
+        function calculateTotals() {
+            const milkInputs = document.querySelectorAll(".milk-input");
+            const fatInputs = document.querySelectorAll(".fat-input");
+            const resultDivs = document.querySelectorAll(".result");
+            let totalMilk = 0;
+            let totalSum = 0;
+
+            milkInputs.forEach((milkInput, index) => {
+                let milkValue = parseFloat(milkInput.value) || 0;
+                let fatValue = parseFloat(fatInputs[index].value) || 0;
+
+                let multiplicationResult = (milkValue * fatValue) / 65;  
+                resultDivs[index].innerText = multiplicationResult.toFixed(2);
+
+                totalMilk += milkValue;
+                totalSum += multiplicationResult; 
+            });
+
+            document.querySelector("#totalMilk").innerText = totalMilk.toFixed(2);
+            document.querySelector("#totalSum").innerText = totalSum.toFixed(2);
+
+            // Calculate Avg Fat
+            let avgFat = totalMilk > 0 ? (totalSum * 65) / totalMilk : 0;
+            document.querySelector("#avgFat").innerText = avgFat.toFixed(2);
+        }
+    </script>
+</body>
+</html>
